@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+<html lang="et"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Nädal 11 · COUNT() ja GROUP BY</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+:root{--ink:#17383b;--soft:#637877;--accent:#116b65;--pale:#e3f3eb;--line:#dce7e0}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f8f8f3;color:var(--ink);font:16px/1.6 'DM Sans',Arial,sans-serif}h1,h2,h3{font-family:'DM Sans',Arial,sans-serif;line-height:1.15;letter-spacing:-.035em}h1{font-size:clamp(48px,7vw,84px);margin:14px 0}h2{font-size:clamp(30px,4vw,45px)}h3{font-size:21px}p{margin:0 0 16px}a{color:inherit}button{cursor:pointer;font:inherit}header{background:#12373d;color:#fff}nav,.hero,main,footer{max-width:1150px;margin:auto;padding-left:28px;padding-right:28px}nav{display:flex;justify-content:space-between;align-items:center;padding-top:20px;padding-bottom:20px;font-size:13px}nav a{text-decoration:none;color:#c5e3de;margin-left:22px}.logo{color:#96d5c6;font-weight:700;letter-spacing:.12em}.hero{padding-top:65px;padding-bottom:85px;display:grid;grid-template-columns:1.1fr .9fr;gap:55px;align-items:center}.hero p{color:#c8e1dc;font-size:19px;max-width:600px}.eyebrow{color:#75c7b2;letter-spacing:.14em;font-size:12px;font-weight:700;text-transform:uppercase}.cta{display:inline-block;background:#ffb681;color:#1b3134;border:0;border-radius:11px;padding:12px 19px;font-weight:700;text-decoration:none;margin-top:13px}.term{background:#0b242b;border:1px solid #42666a;border-radius:18px;overflow:hidden;box-shadow:0 24px 45px #051d2160}.term .dots{padding:15px;border-bottom:1px solid #35595e;color:#ffa976;letter-spacing:5px}.term pre{padding:24px;color:#c9ecdf;font-size:15px;overflow:auto}.term .result{border-top:1px solid #35595e;padding:13px 24px;color:#93d3c2;font:13px monospace}section{padding:75px 0;border-bottom:1px solid var(--line)}.intro{color:var(--soft);font-size:18px;max-width:740px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:25px}.card,.example,.demo{background:white;border:1px solid var(--line);border-radius:17px;padding:23px}.card h3{margin:15px 0 8px}.card p,.example p{color:var(--soft);font-size:14px}code{font:13px monospace;background:var(--pale);color:#14594f;border-radius:6px;padding:4px 7px}.aggregate-intro{margin:0 0 35px}.aggregate-intro h3{margin:25px 0 12px;font-size:26px}.aggregate-intro .intro{font-size:17px}.aggregate-intro ul{padding-left:23px;margin:14px 0 24px}.aggregate-intro li{margin-bottom:5px}.aggregate-intro .codeblock{margin:16px 0}.aggregate-intro .data{max-width:650px;margin:15px 0 22px}.aggregate-intro .small{color:var(--soft);font-size:14px}.note{background:var(--pale);border-left:4px solid #3a9b80;border-radius:12px;padding:20px 23px;margin:25px 0}.versus,.demoColumns{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:25px 0}.versus>div{background:white;border:1px solid var(--line);border-radius:17px;padding:24px}.versus>div:nth-child(2){background:#e6f1ec}.versus h3{font-size:29px;margin:10px 0}.versus li{margin-bottom:8px}.pill{font-size:11px;text-transform:uppercase;letter-spacing:.11em;color:var(--accent);font-weight:700}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}.tabs button{padding:9px 13px;border:1px solid var(--line);border-radius:10px;background:#f5f8f5;color:var(--ink);font-weight:700;font-size:13px}.tabs button.active{background:#176960;color:white}.demo{margin-top:20px}.demo h3{margin:8px 0}.data{width:100%;border-collapse:collapse;font-size:14px}.data td,.data th{border-bottom:1px solid #e2e9e4;padding:8px 11px;text-align:left}.data th{background:#edf5ef;font-size:12px}.dim{opacity:.25}.resultrow{background:#dff3e5}.codeblock{background:#142e33;border-radius:10px;color:#def4e8;padding:18px;overflow:auto;font:13px/1.65 monospace;white-space:pre-wrap}.examples{display:grid;grid-template-columns:1fr 1fr;gap:17px;margin-top:25px}.example{padding:0;overflow:hidden}.example-head{padding:20px 21px 6px}.example h3{font-size:18px;margin:7px 0}.example .codeblock{margin:12px;position:relative;padding:18px}.example pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:0;font:13px/1.65 monospace}.copy{float:right;background:#3d6064;color:white;border:0;border-radius:6px;font-size:11px;padding:5px 9px}.quizwrap{background:#133a3d;color:white;border-radius:22px;padding:32px}.quizwrap h2{margin:10px 0}.quiz{background:white;color:var(--ink);border-radius:15px;padding:24px;margin-top:25px}.answers{display:grid;gap:9px}.answers button{text-align:left;border:1px solid var(--line);background:#f8faf7;padding:12px;border-radius:9px}.answers button.correct{background:#d8f3df;border-color:#4e9c64}.answers button.wrong{background:#ffe9df;border-color:#cc826f}.feedback{min-height:25px;font-weight:700;margin-top:13px}.hidden{display:none}footer{padding-top:30px;padding-bottom:35px;color:var(--soft);font-size:13px}@media(max-width:800px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}.demoColumns{grid-template-columns:1fr}}@media(max-width:600px){nav .links{display:none}.hero,main,nav,footer{padding-left:19px;padding-right:19px}.hero{padding-top:35px;padding-bottom:55px}.grid,.versus,.examples{grid-template-columns:1fr}section{padding:50px 0}.quizwrap{padding:19px}}
+
+/* Õppematerjal / 20 ülesannet as separate tabs */
+.primary-nav{display:flex;align-items:center;gap:10px}.primary-nav .navtab{border:1px solid #42666a;background:transparent;color:#c5e3de;border-radius:9px;padding:9px 13px;font-size:13px;font-weight:700}.primary-nav .navtab.active{background:#e3f3eb;color:#12373d;border-color:#e3f3eb}.page-view[hidden]{display:none!important}.task-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px;margin-top:28px}.task-card{border:1px solid var(--line);background:#fff;border-radius:17px;padding:23px;min-width:0}.task-header{display:flex;align-items:flex-start;gap:15px}.task-header h3{margin:5px 0 10px;font-size:20px}.task-number{flex:0 0 42px;height:42px;display:grid;place-items:center;background:var(--pale);color:var(--accent);border-radius:12px;font-weight:800}.task-card>p{font-size:14px;color:var(--soft)}.task-card details{margin-top:17px}.task-card summary{cursor:pointer;background:#edf5ef;color:#14594f;padding:10px 13px;border-radius:10px;font-weight:700;font-size:14px}.task-card details[open] summary{border-radius:10px 10px 0 0}.task-code{position:relative;background:#142e33;color:#def4e8;padding:15px;border-radius:0 0 10px 10px}.task-code pre{overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;margin:31px 0 0;font:13px/1.65 monospace}.task-copy{position:absolute;top:12px;right:12px;background:#3d6064;border:0;color:white;border-radius:6px;padding:5px 9px;font-size:12px}.task-card[hidden]{display:none}.task-page{min-height:80vh}.task-page .intro{max-width:880px}
+@media(max-width:800px){.task-list{grid-template-columns:1fr}}@media(max-width:600px){nav .links.primary-nav{display:flex;gap:5px}.primary-nav .navtab{font-size:11px;padding:6px 8px}.logo{font-size:11px}.task-card{padding:17px}}
+
+/* Ühe uurimuse õpirada */
+.journey-page{min-height:80vh}.journey-page .intro{max-width:850px}.journey-progress{display:flex;flex-wrap:wrap;gap:7px;margin:26px 0 34px}.journey-progress a{width:35px;height:35px;border:1px solid #bdd6d0;border-radius:50%;display:grid;place-items:center;color:#1e4746;background:#eef7f3;text-decoration:none;font-size:13px;font-weight:700}.journey-progress a:hover,.journey-progress a:focus-visible{background:#205e5b;color:white}.journey-list{display:grid;gap:19px;max-width:980px}.journey-card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:25px;scroll-margin-top:110px}.journey-head{display:flex;gap:15px;align-items:flex-start}.journey-number{display:grid;place-items:center;width:45px;min-width:45px;height:45px;border-radius:12px;color:white;background:#184d4b;font-weight:800}.journey-label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#0b7667;font-weight:800}.journey-head h3{margin:6px 0 13px;font-size:22px}.journey-card p{line-height:1.7;max-width:830px}.journey-solution{margin-top:16px;border:1px solid #bdd6d0;border-radius:12px;overflow:hidden}.journey-solution summary{padding:13px 17px;background:#eaf5f1;cursor:pointer;font-weight:700;color:#174744}.journey-code{position:relative;background:#132a30;padding:42px 16px 15px}.journey-code pre{white-space:pre-wrap;overflow-wrap:anywhere;color:#eefaf5;font:13px/1.65 monospace;margin:0;overflow-x:auto}.journey-copy{position:absolute;right:12px;top:10px;border:0;border-radius:7px;background:#bee6d7;color:#123d35;padding:6px 10px;font-weight:700;cursor:pointer}.journey-next{border-left:3px solid #e6b168;margin-top:19px;padding:10px 14px;background:#fff8ed;line-height:1.6}.journey-finish{max-width:980px;border-radius:16px;background:#e9f5ef;padding:22px;margin-top:26px;font-weight:600;line-height:1.7}@media(max-width:600px){.primary-nav{flex-wrap:wrap;justify-content:flex-end}.journey-card{padding:17px}.journey-head h3{font-size:19px}.journey-progress a{width:31px;height:31px}}
+
+/* Ligipääsetavus: WCAG 2.2 AA sihiga kohandused */
+html{scroll-padding-top:20px}
+body{font-size:17px;line-height:1.65}
+:focus-visible{outline:3px solid #ffb347!important;outline-offset:3px!important;box-shadow:0 0 0 2px #17383b}
+.skip-link{position:fixed;top:10px;left:12px;z-index:999;background:#fff;color:#102f34;padding:12px 18px;border:3px solid #12373d;border-radius:8px;transform:translateY(-160%)}
+.skip-link:focus{transform:none}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+button,summary{min-height:44px}
+button{touch-action:manipulation}
+.primary-nav .navtab{min-height:44px;font-size:14px}
+.tabs button{min-height:44px}
+.copy,.task-copy,.journey-copy,.practice-copy{min-height:38px;font-size:13px}
+.data td,.data th{padding:11px}
+.demo .dim{opacity:.65}
+.pill,.journey-label{color:#075b51}
+.eyebrow{color:#8de0ca}
+main .eyebrow{color:#155f54}
+.card p,.example p,.task-card>p,.intro,.aggregate-intro .small{color:#3c5957}
+.practice-group{font-size:26px;margin:40px 0 15px;letter-spacing:-.02em}
+.practice-card{max-width:990px;background:#fff;border:1px solid #bed2c9;border-radius:16px;padding:23px;margin:14px 0}
+.practice-card h4{font-size:20px;line-height:1.35;margin:7px 0 12px}
+.practice-card p{margin-bottom:12px}
+.practice-num{color:#165e53;font-size:13px;font-weight:800;letter-spacing:.03em}
+.practice-solution{border:1px solid #a4c2b5;border-radius:10px;overflow:hidden;margin-top:15px}
+.practice-solution summary{background:#e5f3ec;padding:12px 15px;color:#164b42;cursor:pointer;font-weight:700}
+.practice-code{position:relative;background:#142e33;padding:55px 18px 18px;color:#ecfff5}
+.practice-code pre{margin:0;overflow-x:auto;line-height:1.75;font-size:14px}
+.practice-code code{background:none;padding:0;color:inherit;white-space:pre}
+.practice-copy{position:absolute;right:13px;top:10px;background:#caecdc;color:#153d35;border:0;border-radius:8px;padding:7px 12px;font-weight:700}
+.practice-explain{padding:15px;margin:0!important;color:#234f46}
+@media(max-width:650px){.primary-nav{justify-content:flex-start!important;width:100%;gap:7px}.primary-nav .navtab{font-size:13px;padding:10px 11px}nav{align-items:flex-start;flex-direction:column;gap:12px}.practice-card{padding:17px}h1{font-size:clamp(35px,8vw,55px)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+@media(forced-colors:active){:focus-visible{outline:3px solid Highlight!important}.active{outline:2px solid Highlight}}
+</style></head><body><a class="skip-link" href="#main-content">Liigu põhisisu juurde</a>
+<header><nav><span class="logo">RKE134 · ANDMEBAASIDE ALUSED</span><span aria-label="Õppematerjali vaated" class="links primary-nav" role="tablist"><button aria-controls="materjal-view" aria-selected="true" class="navtab active" data-page="materjal" id="tab-materjal" role="tab" tabindex="0" type="button">Õppematerjal</button><button aria-controls="ulesanded-view" aria-selected="false" class="navtab" data-page="ulesanded" id="tab-ulesanded" role="tab" tabindex="-1" type="button">20 ülesannet ja lahendused</button><button aria-controls="uurimus-view" aria-selected="false" class="navtab" data-page="uurimus" id="tab-uurimus" role="tab" tabindex="-1" type="button">Samm-sammult uurimus</button><button aria-controls="harjutused-view" aria-selected="false" class="navtab" data-page="harjutused" id="tab-harjutused" role="tab" tabindex="-1" type="button">8 harjutust</button></span></nav><div class="hero"><div><div class="eyebrow">Nädal 11 · SQLite</div><h1>COUNT() ja<br/>GROUP BY<span style="color:#ffb681">.</span></h1><p>Õpime loendama ja rühmitama andmeid raamatukogu andmebaasi abil. Teooria, SQL-päringud, samm-sammult uurimus ja iseseisvad harjutused.</p><button class="cta" data-page="materjal" type="button">Alusta õppimist ↗</button></div><div class="term"><div class="dots">● ● ●</div><pre>SELECT reader_id,<br/>       COUNT(*) AS arv<br/>FROM Loan<br/>GROUP BY reader_id<br/>HAVING COUNT(*) &gt; 3;</pre><div class="result">✓ Üks rida iga valitud lugeja kohta</div></div></div></header>
+<main id="main-content"><div aria-labelledby="tab-materjal" class="page-view" id="materjal-view" role="tabpanel" tabindex="0"><section id="teooria"><div class="eyebrow">01 · Teooria</div><h2>Mis on agregeerimisfunktsioonid?</h2>
+<div class="aggregate-intro"><p class="intro">Andmebaasides võib olla sadu, tuhandeid või isegi miljoneid kirjeid. Mõnikord ei ole meil vaja kõiki kirjeid eraldi vaadata, vaid soovime saada nende kohta üldistavat teavet.</p>
+<p><strong>Näiteks tahame teada:</strong></p><ul><li>Mitu raamatut on raamatukogus?</li><li>Kui palju lugejaid on registreeritud?</li><li>Milline raamat on kõige populaarsem?</li><li>Kui palju raamatuid on iga lugeja laenutanud?</li><li>Milline on raamatute keskmine hind?</li></ul>
+<div class="note"><strong>Agregeerimisfunktsioonid</strong> (inglise keeles <em>aggregate functions</em>) on SQL-i funktsioonid, mis töötlevad mitme rea andmeid ja tagastavad nende põhjal ühe kokkuvõtliku väärtuse.</div>
+<h3>Peamised agregeerimisfunktsioonid</h3><table class="data" role="table"><thead><tr><th scope="col">Funktsioon</th><th scope="col">Mida teeb?</th></tr></thead><tbody><tr><td><code>COUNT()</code></td><td>Loendab kirjete arvu.</td></tr><tr><td><code>SUM()</code></td><td>Arvutab arvväärtuste summa.</td></tr><tr><td><code>AVG()</code></td><td>Arvutab arvväärtuste keskmise.</td></tr><tr><td><code>MIN()</code></td><td>Leiab kõige väiksema väärtuse.</td></tr><tr><td><code>MAX()</code></td><td>Leiab kõige suurema väärtuse.</td></tr></tbody></table>
+<h3>Näide raamatukogu andmebaasist</h3><p>Oletame, et tabelis <code>Book</code> on 150 raamatut. Selle asemel, et neid ükshaaval kokku lugeda, kasutame päringut:</p><pre class="codeblock">SELECT COUNT(*) AS Raamatute_arv
+FROM Book;</pre><p class="small">Näidistulemus (tegelik arv sõltub sinu andmebaasist):</p><table class="data" role="table"><thead><tr><th scope="col">Raamatute_arv</th></tr></thead><tbody><tr><td>150</td></tr></tbody></table>
+<h3>Kuidas on agregeerimisfunktsioonid seotud GROUP BY-ga?</h3><p>Ilma rühmitamiseta arvutab <code>COUNT()</code> ühe kokkuvõtliku väärtuse kõigi valitud kirjete kohta. Kui soovime teada, mitu laenutust on <strong>iga lugeja</strong> vormistanud, kasutame <code>GROUP BY</code> klauslit.</p><pre class="codeblock">SELECT reader_id,
+       COUNT(*) AS Laenutuste_arv
+FROM Loan
+GROUP BY reader_id;</pre><p class="small">Näidistulemus:</p><table class="data" role="table"><thead><tr><th scope="col">reader_id</th><th scope="col">Laenutuste_arv</th></tr></thead><tbody><tr><td>1</td><td>5</td></tr><tr><td>2</td><td>3</td></tr><tr><td>3</td><td>8</td></tr></tbody></table>
+<p>Seega tagastab päring ühe tulemuse iga lugeja kohta. See võimaldab rühmi võrrelda, märgata seaduspärasusi ning koostada statistikat ja aruandeid.</p><div class="note"><strong>Pea meeles!</strong> Agregeerimisfunktsioonid aitavad teha üksikutest kirjetest arusaadava kokkuvõtte. <code>GROUP BY</code> ei ole funktsioon, vaid SQL-i klausel, mis võimaldab arvutada tulemuse iga rühma jaoks eraldi.</div></div>
+<div class="eyebrow">Kiirspikker</div><h2>Funktsioonid ja käsud</h2><p class="intro">Mida iga SQL-i osa teeb? Siit leiad lühikesed selgitused.</p><div class="grid" id="glossary"></div></section>
+<section id="erinevus"><div class="eyebrow">02 · Oluline erinevus</div><h2>WHERE või HAVING?</h2><p class="intro">Mõlemad filtreerivad, aga erineval hetkel. WHERE töötab enne rühmitamist, HAVING pärast rühmitamist.</p><div class="versus"><div><div class="pill">Enne GROUP BY-d</div><h3>WHERE</h3><ul><li>Filtreerib üksikuid ridu.</li><li>Jätab alles tingimusele vastavad kirjed.</li><li>Agregeerimisfunktsiooni ei saa otse WHERE-tingimuses kasutada.</li></ul><code>WHERE loan_date &gt;= '2026-01-01'</code></div><div><div class="pill">Pärast GROUP BY-d</div><h3>HAVING</h3><ul><li>Filtreerib moodustatud rühmi.</li><li>Võimaldab kontrollida COUNT() tulemust.</li><li>Jätab alles ainult tingimusele vastavad rühmad.</li></ul><code>HAVING COUNT(*) &gt; 3</code></div></div><div class="demo"><div class="pill">Interaktiivne näide · Näidisandmed</div><h3>Vaata, kuidas tulemus muutub</h3><p>Vali tingimus ja jälgi, millised laenutused arvesse lähevad ning millised lugejad tulemusse jäävad.</p><div class="tabs" id="modes"><button class="active" data-mode="all">Kõik laenutused</button><button data-mode="where">WHERE</button><button data-mode="having">HAVING</button><button data-mode="both">WHERE + HAVING</button></div><div class="demoColumns"><div><div class="pill">Loan · algandmed</div><table class="data" role="table"><thead><tr><th scope="col">reader_id</th><th scope="col">loan_date</th></tr></thead><tbody id="loans"></tbody></table></div><div><div class="pill">Päring ja tulemus</div><pre class="codeblock" id="demoSQL"></pre><table class="data" role="table"><thead><tr><th scope="col">reader_id</th><th scope="col">Laenutuste_arv</th></tr></thead><tbody id="result"></tbody></table><p id="explanation" style="color:var(--soft);font-size:13px;margin-top:14px"></p></div></div></div><div class="note"><b>Pea meeles!</b> WHERE otsustab, <b>millised read lähevad arvesse</b>. HAVING otsustab, <b>millised rühmad jäävad tulemusse</b>.</div></section>
+<section id="naited"><div class="eyebrow">03 · Raamatukogu andmebaas</div><h2>SQL-päringud samm-sammult</h2><p class="intro">18 näidet: lihtsast loendamisest mitme tabeli ühendamise ja HAVING-tingimuseni. Kopeeri päring ja proovi oma SQLite andmebaasis.</p><div class="tabs" id="filters"><button class="active" data-filter="all">Kõik</button><button data-filter="count">COUNT()</button><button data-filter="group">GROUP BY</button><button data-filter="having">HAVING</button><button data-filter="advanced">Keerulisemad</button></div><div class="examples" id="examples"></div><div class="note"><b>Märkus.</b> Näited kasutavad tabelite nimesid Reader, Book, Book_Copy, Loan ja Loan_Line. Näited on kohandatud kursuse LibraryDB andmebaasi struktuurile. Väljaandmiste arv ei ole sama mis erinevate raamatute arv.</div></section>
+<section id="harjuta" style="border:0"><div class="quizwrap"><div class="eyebrow">04 · Enesekontroll</div><h2>Kas said aru?</h2><p>Kolm väikest küsimust, et olulisem kinnistuks.</p><div class="quiz"><div class="pill" id="qnum"></div><h3 id="question"></h3><div class="answers" id="answers"></div><div aria-live="polite" class="feedback" id="feedback"></div><button class="cta hidden" id="next">Järgmine →</button></div></div></section></div><div aria-labelledby="tab-ulesanded" class="page-view" hidden="" id="ulesanded-view" role="tabpanel" tabindex="0"><section class="task-page" id="ulesanded"><div class="eyebrow">05 · Iseseisev töö ja lahendused</div><h2>20 küsimust meie raamatukogu kohta</h2><p class="intro">Uuri 211 raamatu, 1050 eksemplari ja 200 lugejaga SQLite andmebaasi. Proovi kõigepealt ise päring kirjutada ning ava seejärel SQL-lahendus. Kõik 20 päringut on kontrollitud kursuse andmebaasis.</p><div class="note"><strong>Tööjuhis:</strong> ava <code>LibraryDB_week11_filled.db</code> SQLite'i programmis, kirjuta päring ja võrdle tulemust näidislahendusega. <strong>COUNT()</strong> loendab tabelikirjeid, <strong>GROUP BY</strong> rühmitab, <strong>HAVING</strong> filtreerib rühmi. Kuvatud arvud sõltuvad kasutatavast andmebaasiversioonist.</div><div aria-label="Ülesannete teemad" class="tabs task-filters" role="group"><button class="active" data-task-filter="all" type="button">Kõik 20</button><button data-task-filter="COUNT()" type="button">COUNT() · 1–5</button><button data-task-filter="GROUP BY" type="button">GROUP BY · 6–10</button><button data-task-filter="ORDER BY" type="button">ORDER BY · 11–13</button><button data-task-filter="HAVING" type="button">HAVING · 14–16</button><button data-task-filter="KOKKU" type="button">Kõik koos · 17–20</button></div><div class="task-list" id="task-list"><article class="task-card" id="task-1"><div class="task-header"><span class="task-number">01</span><div><span class="pill">COUNT()</span><h3>Mitu erinevat raamatut on meie raamatukogus?</h3></div></div><p>Loendame tabeli Book kirjed. Iga rida tähistab üht raamatut.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 1 SQL-kood" class="task-copy" data-task="0" type="button">Kopeeri SQL</button><pre>SELECT COUNT(*) AS Raamatute_arv
+FROM Book;</pre></div></details></article><article class="task-card" id="task-2"><div class="task-header"><span class="task-number">02</span><div><span class="pill">COUNT()</span><h3>Mitu raamatueksemplari on raamatukogus kokku?</h3></div></div><p>Ühel raamatul võib olla mitu füüsilist eksemplari.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 2 SQL-kood" class="task-copy" data-task="1" type="button">Kopeeri SQL</button><pre>SELECT COUNT(*) AS Eksemplaride_arv
+FROM Book_Copy;</pre></div></details></article><article class="task-card" id="task-3"><div class="task-header"><span class="task-number">03</span><div><span class="pill">COUNT()</span><h3>Mitu lugejat on raamatukogus registreeritud?</h3></div></div><p>Loendame kõik registreeritud lugejad.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 3 SQL-kood" class="task-copy" data-task="2" type="button">Kopeeri SQL</button><pre>SELECT COUNT(*) AS Lugejate_arv
+FROM Reader;</pre></div></details></article><article class="task-card" id="task-4"><div class="task-header"><span class="task-number">04</span><div><span class="pill">COUNT()</span><h3>Mitu laenutust on raamatukogus vormistatud?</h3></div></div><p>Üks Loan kirje tähistab laenutust, mis võib sisaldada mitut eksemplari.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 4 SQL-kood" class="task-copy" data-task="3" type="button">Kopeeri SQL</button><pre>SELECT COUNT(*) AS Laenutuste_arv
+FROM Loan;</pre></div></details></article><article class="task-card" id="task-5"><div class="task-header"><span class="task-number">05</span><div><span class="pill">COUNT()</span><h3>Mitu raamatueksemplari on kokku välja laenutatud?</h3></div></div><p>Loendame kõik Loan_Line kirjed, ka sama eksemplari korduslaenutused.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 5 SQL-kood" class="task-copy" data-task="4" type="button">Kopeeri SQL</button><pre>SELECT COUNT(*) AS Valjastamiste_arv
+FROM Loan_Line;</pre></div></details></article><article class="task-card" id="task-6"><div class="task-header"><span class="task-number">06</span><div><span class="pill">GROUP BY</span><h3>Mitu eksemplari on igast raamatust?</h3></div></div><p>LEFT JOIN näitab ka raamatuid, millel pole ühtki eksemplari.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 6 SQL-kood" class="task-copy" data-task="5" type="button">Kopeeri SQL</button><pre>SELECT Book.title,
+       COUNT(Book_Copy.book_copy_id) AS Eksemplaride_arv
+FROM Book
+LEFT JOIN Book_Copy
+  ON Book.book_id = Book_Copy.book_id
+GROUP BY Book.book_id, Book.title
+ORDER BY Eksemplaride_arv DESC, Book.title;</pre></div></details></article><article class="task-card" id="task-7"><div class="task-header"><span class="task-number">07</span><div><span class="pill">GROUP BY</span><h3>Mitu laenutust on iga lugeja vormistanud?</h3></div></div><p>LEFT JOIN säilitab ka lugejad, kellel on null laenutust.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 7 SQL-kood" class="task-copy" data-task="6" type="button">Kopeeri SQL</button><pre>SELECT Reader.first_name, Reader.last_name,
+       COUNT(Loan.loan_id) AS Laenutuste_arv
+FROM Reader
+LEFT JOIN Loan
+  ON Reader.reader_id = Loan.reader_id
+GROUP BY Reader.reader_id, Reader.first_name, Reader.last_name
+ORDER BY Laenutuste_arv DESC, Reader.last_name;</pre></div></details></article><article class="task-card" id="task-8"><div class="task-header"><span class="task-number">08</span><div><span class="pill">GROUP BY</span><h3>Mitu korda on iga raamatut laenutatud?</h3></div></div><p>Arvestame kõikide eksemplaride kõiki väljastamisi.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 8 SQL-kood" class="task-copy" data-task="7" type="button">Kopeeri SQL</button><pre>SELECT Book.title,
+       COUNT(Loan_Line.loan_line_id) AS Laenutuskordade_arv
+FROM Book
+LEFT JOIN Book_Copy
+  ON Book.book_id = Book_Copy.book_id
+LEFT JOIN Loan_Line
+  ON Book_Copy.book_copy_id = Loan_Line.copy_id
+GROUP BY Book.book_id, Book.title
+ORDER BY Laenutuskordade_arv DESC, Book.title;</pre></div></details></article><article class="task-card" id="task-9"><div class="task-header"><span class="task-number">09</span><div><span class="pill">GROUP BY</span><h3>Mitu raamatut kuulub igasse žanrisse?</h3></div></div><p>Loendame žanriga seotud erinevaid raamatuid, mitte eksemplare.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 9 SQL-kood" class="task-copy" data-task="8" type="button">Kopeeri SQL</button><pre>SELECT Genre.genre_name,
+       COUNT(DISTINCT Book_Genre.book_id) AS Raamatute_arv
+FROM Genre
+LEFT JOIN Book_Genre
+  ON Genre.genre_id = Book_Genre.genre_id
+GROUP BY Genre.genre_id, Genre.genre_name
+ORDER BY Raamatute_arv DESC, Genre.genre_name;</pre></div></details></article><article class="task-card" id="task-10"><div class="task-header"><span class="task-number">10</span><div><span class="pill">GROUP BY</span><h3>Mitu raamatut on igal autoril meie raamatukogus?</h3></div></div><p>Loendame iga autoriga seotud erinevaid raamatuid.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 10 SQL-kood" class="task-copy" data-task="9" type="button">Kopeeri SQL</button><pre>SELECT Author.first_name, Author.last_name,
+       COUNT(DISTINCT Book_Author.book_id) AS Raamatute_arv
+FROM Author
+LEFT JOIN Book_Author
+  ON Author.author_id = Book_Author.author_id
+GROUP BY Author.author_id, Author.first_name, Author.last_name
+ORDER BY Raamatute_arv DESC, Author.last_name;</pre></div></details></article><article class="task-card" id="task-11"><div class="task-header"><span class="task-number">11</span><div><span class="pill">ORDER BY</span><h3>Millised on viis kõige populaarsemat raamatut?</h3></div></div><p>Populaarsust mõõdame registreeritud väljastamiste arvuga.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 11 SQL-kood" class="task-copy" data-task="10" type="button">Kopeeri SQL</button><pre>SELECT Book.title,
+       COUNT(Loan_Line.loan_line_id) AS Laenutuskordade_arv
+FROM Book
+JOIN Book_Copy
+  ON Book.book_id = Book_Copy.book_id
+JOIN Loan_Line
+  ON Book_Copy.book_copy_id = Loan_Line.copy_id
+GROUP BY Book.book_id, Book.title
+ORDER BY Laenutuskordade_arv DESC, Book.title
+LIMIT 5;</pre></div></details></article><article class="task-card" id="task-12"><div class="task-header"><span class="task-number">12</span><div><span class="pill">ORDER BY</span><h3>Kes on viis kõige aktiivsemat lugejat?</h3></div></div><p>Aktiivsust mõõdame vormistatud laenutuste arvuga.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 12 SQL-kood" class="task-copy" data-task="11" type="button">Kopeeri SQL</button><pre>SELECT Reader.first_name, Reader.last_name,
+       COUNT(Loan.loan_id) AS Laenutuste_arv
+FROM Reader
+JOIN Loan
+  ON Reader.reader_id = Loan.reader_id
+GROUP BY Reader.reader_id, Reader.first_name, Reader.last_name
+ORDER BY Laenutuste_arv DESC, Reader.last_name
+LIMIT 5;</pre></div></details></article><article class="task-card" id="task-13"><div class="task-header"><span class="task-number">13</span><div><span class="pill">ORDER BY</span><h3>Millisesse žanrisse kuulub kõige rohkem raamatuid?</h3></div></div><p>LIMIT 1 näitab üht kõige suurema raamatute arvuga žanrit.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 13 SQL-kood" class="task-copy" data-task="12" type="button">Kopeeri SQL</button><pre>SELECT Genre.genre_name,
+       COUNT(DISTINCT Book_Genre.book_id) AS Raamatute_arv
+FROM Genre
+JOIN Book_Genre
+  ON Genre.genre_id = Book_Genre.genre_id
+GROUP BY Genre.genre_id, Genre.genre_name
+ORDER BY Raamatute_arv DESC, Genre.genre_name
+LIMIT 1;</pre></div></details></article><article class="task-card" id="task-14"><div class="task-header"><span class="task-number">14</span><div><span class="pill">HAVING</span><h3>Milliseid raamatuid on raamatukogus rohkem kui viis eksemplari?</h3></div></div><p>HAVING jätab alles ainult rühmad, mille eksemplaride arv on üle viie.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 14 SQL-kood" class="task-copy" data-task="13" type="button">Kopeeri SQL</button><pre>SELECT Book.title,
+       COUNT(Book_Copy.book_copy_id) AS Eksemplaride_arv
+FROM Book
+JOIN Book_Copy
+  ON Book.book_id = Book_Copy.book_id
+GROUP BY Book.book_id, Book.title
+HAVING COUNT(Book_Copy.book_copy_id) &gt; 5
+ORDER BY Eksemplaride_arv DESC, Book.title;</pre></div></details></article><article class="task-card" id="task-15"><div class="task-header"><span class="task-number">15</span><div><span class="pill">HAVING</span><h3>Millised lugejad on vormistanud rohkem kui kümme laenutust?</h3></div></div><p>WHERE ei sobiks COUNT() tulemuse filtreerimiseks; kasutame HAVING klauslit.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 15 SQL-kood" class="task-copy" data-task="14" type="button">Kopeeri SQL</button><pre>SELECT Reader.first_name, Reader.last_name,
+       COUNT(Loan.loan_id) AS Laenutuste_arv
+FROM Reader
+JOIN Loan
+  ON Reader.reader_id = Loan.reader_id
+GROUP BY Reader.reader_id, Reader.first_name, Reader.last_name
+HAVING COUNT(Loan.loan_id) &gt; 10
+ORDER BY Laenutuste_arv DESC, Reader.last_name;</pre></div></details></article><article class="task-card" id="task-16"><div class="task-header"><span class="task-number">16</span><div><span class="pill">HAVING</span><h3>Milliseid raamatuid on laenutatud rohkem kui viis korda?</h3></div></div><p>Loendame väljastamised ning filtreerime rühmitatud tulemuse.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 16 SQL-kood" class="task-copy" data-task="15" type="button">Kopeeri SQL</button><pre>SELECT Book.title,
+       COUNT(Loan_Line.loan_line_id) AS Laenutuskordade_arv
+FROM Book
+JOIN Book_Copy
+  ON Book.book_id = Book_Copy.book_id
+JOIN Loan_Line
+  ON Book_Copy.book_copy_id = Loan_Line.copy_id
+GROUP BY Book.book_id, Book.title
+HAVING COUNT(Loan_Line.loan_line_id) &gt; 5
+ORDER BY Laenutuskordade_arv DESC, Book.title;</pre></div></details></article><article class="task-card" id="task-17"><div class="task-header"><span class="task-number">17</span><div><span class="pill">KOKKU</span><h3>Millised lugejad ei ole veel kordagi raamatuid laenutanud?</h3></div></div><p>LEFT JOIN + HAVING COUNT(...) = 0 näitab lugejad, kellel puuduvad laenutused.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 17 SQL-kood" class="task-copy" data-task="16" type="button">Kopeeri SQL</button><pre>SELECT Reader.first_name, Reader.last_name,
+       COUNT(Loan.loan_id) AS Laenutuste_arv
+FROM Reader
+LEFT JOIN Loan
+  ON Reader.reader_id = Loan.reader_id
+GROUP BY Reader.reader_id, Reader.first_name, Reader.last_name
+HAVING COUNT(Loan.loan_id) = 0
+ORDER BY Reader.last_name, Reader.first_name;</pre></div></details></article><article class="task-card" id="task-18"><div class="task-header"><span class="task-number">18</span><div><span class="pill">KOKKU</span><h3>Milliseid raamatuid ei ole veel kordagi laenutatud?</h3></div></div><p>Otsime raamatud, mille ühegi eksemplariga pole seotud väljastamise kirjet.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 18 SQL-kood" class="task-copy" data-task="17" type="button">Kopeeri SQL</button><pre>SELECT Book.title,
+       COUNT(Loan_Line.loan_line_id) AS Laenutuskordade_arv
+FROM Book
+LEFT JOIN Book_Copy
+  ON Book.book_id = Book_Copy.book_id
+LEFT JOIN Loan_Line
+  ON Book_Copy.book_copy_id = Loan_Line.copy_id
+GROUP BY Book.book_id, Book.title
+HAVING COUNT(Loan_Line.loan_line_id) = 0
+ORDER BY Book.title;</pre></div></details></article><article class="task-card" id="task-19"><div class="task-header"><span class="task-number">19</span><div><span class="pill">KOKKU</span><h3>Mitu raamatueksemplari on praegu lugejate käes ja veel tagastamata?</h3></div></div><p>Iga NULL return_date märgib kirjet, mille tagastamine pole registreeritud.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 19 SQL-kood" class="task-copy" data-task="18" type="button">Kopeeri SQL</button><pre>SELECT COUNT(DISTINCT copy_id) AS Tagastamata_eksemplare
+FROM Loan_Line
+WHERE return_date IS NULL;</pre></div></details></article><article class="task-card" id="task-20"><div class="task-header"><span class="task-number">20</span><div><span class="pill">KOKKU</span><h3>Millised lugejad on laenutanud kõige rohkem raamatueksemplare?</h3></div></div><p>Võrdleme Loan_Line kirjeid, mitte Loan tabelis olevate laenutuste arvu.</p><details><summary>Vaata SQL-lahendust</summary><div class="task-code"><button aria-label="Kopeeri ülesande 20 SQL-kood" class="task-copy" data-task="19" type="button">Kopeeri SQL</button><pre>SELECT Reader.first_name, Reader.last_name,
+       COUNT(Loan_Line.loan_line_id) AS Valjastamiste_arv
+FROM Reader
+JOIN Loan
+  ON Reader.reader_id = Loan.reader_id
+JOIN Loan_Line
+  ON Loan.loan_id = Loan_Line.loan_id
+GROUP BY Reader.reader_id, Reader.first_name, Reader.last_name
+ORDER BY Valjastamiste_arv DESC, Reader.last_name
+LIMIT 10;</pre></div></details></article></div></section></div><div aria-labelledby="tab-uurimus" class="page-view" hidden="" id="uurimus-view" role="tabpanel" tabindex="0"><section class="journey-page" id="uurimus"><div class="eyebrow">06 · Videoloengu läbiv ülesanne</div><h2>Uurime raamatukogu laenutusi samm-sammult</h2><p class="intro">See on üks terviklik uurimus, mitte kümme eraldi ülesannet. Alusta laenutuste loendamisest ja täienda iga järgmise küsimuse juures senist päringut. Enne näidislahenduse avamist proovi kood ise kirjutada.</p><div class="note"><strong>Vaja läheb:</strong> <code>LibraryDB_week11_filled.db</code>. Ava andmebaas oma SQLite programmis. Iga lahenduse saad avada ja kopeerida; päringuid siin veebilehel ei käivitata.</div><div aria-label="Uurimuse sammud" class="journey-progress"><a data-journey-link="1" href="#samm-1">1</a><a data-journey-link="2" href="#samm-2">2</a><a data-journey-link="3" href="#samm-3">3</a><a data-journey-link="4" href="#samm-4">4</a><a data-journey-link="5" href="#samm-5">5</a><a data-journey-link="6" href="#samm-6">6</a><a data-journey-link="7" href="#samm-7">7</a><a data-journey-link="8" href="#samm-8">8</a><a data-journey-link="9" href="#samm-9">9</a><a data-journey-link="10" href="#samm-10">10</a></div><div class="journey-list"><article class="journey-card" id="samm-1"><div class="journey-head"><span class="journey-number">01</span><div><span class="journey-label">COUNT()</span><h3>Kui palju laenutusi on meie raamatukogus kokku vormistatud?</h3></div></div><p>Alustame üldpildist: enne kui uurime lugejate tegevust, vaatame, kui palju laenutusi on üldse registreeritud.</p><details class="journey-solution"><summary>Vaata SQL-lahendust</summary><div class="journey-code"><button aria-label="Kopeeri 1. ülesande SQL" class="journey-copy" data-journey-copy="1" type="button">Kopeeri SQL</button><pre><code>SELECT COUNT(*) AS Laenutuste_arv
+FROM Loan;</code></pre></div></details><div class="journey-next"><strong>Järgmine küsimus:</strong> Saime ühe kokkuvõtliku arvu. Järgmisena uurime ainult 2026. aasta laenutusi.</div></article><article class="journey-card" id="samm-2"><div class="journey-head"><span class="journey-number">02</span><div><span class="journey-label">WHERE</span><h3>Mitu laenutust on vormistatud alates 1. jaanuarist 2026?</h3></div></div><p>Kogu ajalugu on huvitav, kuid keskendume nüüd uuematele laenutustele. Lisame eelmisele päringule kuupäevatingimuse.</p><details class="journey-solution"><summary>Vaata SQL-lahendust</summary><div class="journey-code"><button aria-label="Kopeeri 2. ülesande SQL" class="journey-copy" data-journey-copy="2" type="button">Kopeeri SQL</button><pre><code>SELECT COUNT(*) AS Laenutuste_arv
+FROM Loan
+WHERE loan_date &gt;= '2026-01-01';</code></pre></div></details><div class="journey-next"><strong>Järgmine küsimus:</strong> WHERE valis kõigepealt sobivad read. Aga millised lugejad need laenutused vormistasid?</div></article><article class="journey-card" id="samm-3"><div class="journey-head"><span class="journey-number">03</span><div><span class="journey-label">GROUP BY</span><h3>Mitu laenutust on iga lugeja vormistanud?</h3></div></div><p>Senine COUNT() andis ühe arvu. Et võrrelda lugejaid eraldi, rühmitame kõik laenutused reader_id alusel.</p><details class="journey-solution"><summary>Vaata SQL-lahendust</summary><div class="journey-code"><button aria-label="Kopeeri 3. ülesande SQL" class="journey-copy" data-journey-copy="3" type="button">Kopeeri SQL</button><pre><code>SELECT reader_id,
+       COUNT(*) AS Laenutuste_arv
+FROM Loan
+GROUP BY reader_id;</code></pre></div></details><div class="journey-next"><strong>Järgmine küsimus:</strong> Nüüd on igal lugejal oma tulemus. Saame sellele lisada eelmise ülesande kuupäevatingimuse.</div></article><article class="journey-card" id="samm-4"><div class="journey-head"><span class="journey-number">04</span><div><span class="journey-label">WHERE + GROUP BY</span><h3>Mitu laenutust on iga lugeja vormistanud alates 1. jaanuarist 2026?</h3></div></div><p>Ühendame 2. ja 3. ülesande: piirame kõigepealt kuupäevadega read ja seejärel loendame need lugejate kaupa.</p><details class="journey-solution"><summary>Vaata SQL-lahendust</summary><div class="journey-code"><button aria-label="Kopeeri 4. ülesande SQL" class="journey-copy" data-journey-copy="4" type="button">Kopeeri SQL</button><pre><code>SELECT reader_id,
+       COUNT(*) AS Laenutuste_arv
+FROM Loan
+WHERE loan_date &gt;= '2026-01-01'
+GROUP BY reader_id;</code></pre></div></details><div class="journey-next"><strong>Järgmine küsimus:</strong> Meil on lugejate kaupa arvud, kuid esialgu pole teada, kes on nimekirja tipus.</div></article><article class="journey-card" id="samm-5"><div class="journey-head"><span class="journey-number">05</span><div><span class="journey-label">ORDER BY</span><h3>Millised lugejad on 2026. aastal kõige rohkem laenutusi vormistanud?</h3></div></div><p>Sama päringu tulemuse saab muuta hõlpsasti loetavaks edetabeliks. Lisame kahaneva sortimise.</p><details class="journey-solution"><summary>Vaata SQL-lahendust</summary><div class="journey-code"><button aria-label="Kopeeri 5. ülesande SQL" class="journey-copy" data-journey-copy="5" type="button">Kopeeri SQL</button><pre><code>SELECT reader_id,
+       COUNT(*) AS Laenutuste_arv
+FROM Loan
+WHERE loan_date &gt;= '2026-01-01'
+GROUP BY reader_id
+ORDER BY Laenutuste_arv DESC;</code></pre></div></details><div class="journey-next"><strong>Järgmine küsimus:</strong> Edetabelis on palju ridu. Võiksime välja tuua ainult esiviisiku.</div></article><article class="journey-card" id="samm-6"><div class="journey-head"><span class="journey-number">06</span><div><span class="journey-label">LIMIT</span><h3>Kes on 2026. aasta viis kõige aktiivsemat lugejat?</h3></div></div><p>Jätame eelmise päringu alles ja piirame tulemuse viie esimese reaga.</p><details class="journey-solution"><summary>Vaata SQL-lahendust</summary><div class="journey-code"><button aria-label="Kopeeri 6. ülesande SQL" class="journey-copy" data-journey-copy="6" type="button">Kopeeri SQL</button><pre><code>SELECT reader_id,
+       COUNT(*) AS Laenutuste_arv
+FROM Loan
+WHERE loan_date &gt;= '2026-01-01'
+GROUP BY reader_id
+ORDER BY Laenutuste_arv DESC
+LIMIT 5;</code></pre></div></details><div class="journey-next"><strong>Järgmine küsimus:</strong> Viis aktiivseimat on teada. Aga mis saab siis, kui tahame leida kõik kindla aktiivsuse taseme ületanud lugejad?</div></article><article class="journey-card" id="samm-7"><div class="journey-head"><span class="journey-number">07</span><div><span class="journey-label">HAVING</span><h3>Millised lugejad on 2026. aastal vormistanud rohkem kui viis laenutust?</h3></div></div><p>Esiviisiku asemel otsime kõiki lugejaid, kelle laenutuste arv ületab viie. Filtreerida tuleb juba loendatud rühmi.</p><details class="journey-solution"><summary>Vaata SQL-lahendust</summary><div class="journey-code"><button aria-label="Kopeeri 7. ülesande SQL" class="journey-copy" data-journey-copy="7" type="button">Kopeeri SQL</button><pre><code>SELECT reader_id,
+       COUNT(*) AS Laenutuste_arv
+FROM Loan
+WHERE loan_date &gt;= '2026-01-01'
+GROUP BY reader_id
+HAVING COUNT(*) &gt; 5
+ORDER BY Laenutuste_arv DESC;</code></pre></div></details><div class="journey-next"><strong>Järgmine küsimus:</strong> WHERE piirab kuupäeva järgi üksikuid ridu, HAVING aga valib COUNT() tulemuse järgi rühmad. Nüüd tahaksime reader_id asemel näha nimesid.</div></article><article class="journey-card" id="samm-8"><div class="journey-head"><span class="journey-number">08</span><div><span class="journey-label">JOIN</span><h3>Kes on need aktiivsed lugejad? Kuva ka nende nimed.</h3></div></div><p>Seome eelmise tulemuse tabeliga Reader. Nii näeme reader_id asemel ees- ja perekonnanime.</p><details class="journey-solution"><summary>Vaata SQL-lahendust</summary><div class="journey-code"><button aria-label="Kopeeri 8. ülesande SQL" class="journey-copy" data-journey-copy="8" type="button">Kopeeri SQL</button><pre><code>SELECT Reader.first_name,
+       Reader.last_name,
+       COUNT(Loan.loan_id) AS Laenutuste_arv
+FROM Reader
+JOIN Loan
+  ON Reader.reader_id = Loan.reader_id
+WHERE Loan.loan_date &gt;= '2026-01-01'
+GROUP BY Reader.reader_id, Reader.first_name, Reader.last_name
+HAVING COUNT(Loan.loan_id) &gt; 5
+ORDER BY Laenutuste_arv DESC;</code></pre></div></details><div class="journey-next"><strong>Järgmine küsimus:</strong> Aktiivsed lugejad on nähtavad, kuid INNER JOIN ei näita neid, kes pole midagi laenutanud. Kuidas kaasata ka nemad?</div></article><article class="journey-card" id="samm-9"><div class="journey-head"><span class="journey-number">09</span><div><span class="journey-label">LEFT JOIN</span><h3>Mitu laenutust on iga registreeritud lugeja vormistanud?</h3></div></div><p>Asendame JOIN-i LEFT JOIN-iga ja eemaldame aktiivsuse ning kuupäeva piirangud. Nüüd näeme kõiki registreeritud lugejaid.</p><details class="journey-solution"><summary>Vaata SQL-lahendust</summary><div class="journey-code"><button aria-label="Kopeeri 9. ülesande SQL" class="journey-copy" data-journey-copy="9" type="button">Kopeeri SQL</button><pre><code>SELECT Reader.first_name,
+       Reader.last_name,
+       COUNT(Loan.loan_id) AS Laenutuste_arv
+FROM Reader
+LEFT JOIN Loan
+  ON Reader.reader_id = Loan.reader_id
+GROUP BY Reader.reader_id, Reader.first_name, Reader.last_name
+ORDER BY Laenutuste_arv DESC;</code></pre></div></details><div class="journey-next"><strong>Järgmine küsimus:</strong> Oluline: COUNT(Loan.loan_id) annab laenutuseta lugejale 0, kuid COUNT(*) annaks 1. Nüüd eraldame just need lugejad, kelle tulemus on null.</div></article><article class="journey-card" id="samm-10"><div class="journey-head"><span class="journey-number">10</span><div><span class="journey-label">LEFT JOIN + HAVING</span><h3>Millised lugejad ei ole veel kordagi raamatuid laenutanud?</h3></div></div><p>Viimase sammuna jätame alles ainult need lugejate rühmad, mille laenutuste arv on null.</p><details class="journey-solution"><summary>Vaata SQL-lahendust</summary><div class="journey-code"><button aria-label="Kopeeri 10. ülesande SQL" class="journey-copy" data-journey-copy="10" type="button">Kopeeri SQL</button><pre><code>SELECT Reader.first_name,
+       Reader.last_name,
+       COUNT(Loan.loan_id) AS Laenutuste_arv
+FROM Reader
+LEFT JOIN Loan
+  ON Reader.reader_id = Loan.reader_id
+GROUP BY Reader.reader_id, Reader.first_name, Reader.last_name
+HAVING COUNT(Loan.loan_id) = 0;</code></pre></div></details><div class="journey-next"><strong>Järgmine küsimus:</strong> Uuring on valmis! Alustasime ühest COUNT() väärtusest ja lõpetasime päringuga, mis ühendab LEFT JOIN-i, GROUP BY ja HAVING-tingimuse.</div></article></div><div class="journey-finish">Oled jõudnud uurimuse lõppu! Proovi nüüd iseseisvalt lahendada teisel vahekaardil olevad 20 harjutusülesannet, sealhulgas raamatute, autorite ja žanrite kohta.</div></section></div><div aria-labelledby="tab-harjutused" class="page-view" hidden="" id="harjutused-view" role="tabpanel" tabindex="0"><section class="task-page"><div class="eyebrow">07 · Kinnistavad harjutused</div><h2 id="harjutused-title">Uurime raamatukogu lähemalt</h2><p class="intro">Kaheksa harjutust raamatute, eksemplaride, žanrite, autorite ja tagastuste kohta. Kasuta ainult selle nädala uusi võtteid <code>COUNT()</code> ja <code>GROUP BY</code> koos varem õpitud <code>WHERE</code> ja <code>JOIN</code>-iga.</p><p class="note"><strong>Tööjuhis:</strong> Ava <code>LibraryDB_week11_filled.db</code> SQLite’i keskkonnas. Kirjuta kõigepealt oma päring, kontrolli tulemust andmebaasis ning ava lahendus alles seejärel. Näidislahendused ei käivitu sellel lehel.</p><h3 class="practice-group">Osa 1. Uurime raamatuid</h3><article aria-labelledby="practice-title-1" class="practice-card"><div class="practice-num">Ülesanne 1 / 8</div><h4 id="practice-title-1">Mitu raamatueksemplari on meie raamatukogus kokku?</h4><p>Leia, mitu raamatueksemplari on raamatukogu andmebaasis registreeritud.</p><details class="practice-solution"><summary>Vaata SQL-lahendust</summary><div class="practice-code"><button aria-label="Kopeeri ülesande 1 SQL-kood" class="practice-copy" data-practice-copy="1" type="button">Kopeeri SQL</button><pre><code>SELECT COUNT(*) AS Eksemplaride_arv
+FROM Book_Copy;</code></pre></div><p class="practice-explain">Selgitus: Loendame tabeli Book_Copy read.</p></details></article><article aria-labelledby="practice-title-2" class="practice-card"><div class="practice-num">Ülesanne 2 / 8</div><h4 id="practice-title-2">Mitu raamatut on ilmunud igal aastal?</h4><p>Rühmita raamatud ilmumisaasta järgi ja leia, mitu raamatut on igal aastal ilmunud.</p><details class="practice-solution"><summary>Vaata SQL-lahendust</summary><div class="practice-code"><button aria-label="Kopeeri ülesande 2 SQL-kood" class="practice-copy" data-practice-copy="2" type="button">Kopeeri SQL</button><pre><code>SELECT year_of_publishing,
+       COUNT(*) AS Raamatute_arv
+FROM Book
+GROUP BY year_of_publishing;</code></pre></div><p class="practice-explain">Selgitus: Iga ilmumisaasta moodustab omaette rühma.</p></details></article><article aria-labelledby="practice-title-3" class="practice-card"><div class="practice-num">Ülesanne 3 / 8</div><h4 id="practice-title-3">Mitu eksemplari on igast raamatust?</h4><p>Kuva iga raamatu pealkiri ja eksemplaride arv. Näita ka raamatuid, millel ei ole ühtegi eksemplari.</p><details class="practice-solution"><summary>Vaata SQL-lahendust</summary><div class="practice-code"><button aria-label="Kopeeri ülesande 3 SQL-kood" class="practice-copy" data-practice-copy="3" type="button">Kopeeri SQL</button><pre><code>SELECT Book.title,
+       COUNT(Book_Copy.book_copy_id) AS Eksemplaride_arv
+FROM Book
+LEFT JOIN Book_Copy ON Book.book_id = Book_Copy.book_id
+GROUP BY Book.book_id, Book.title;</code></pre></div><p class="practice-explain">Selgitus: LEFT JOIN säilitab ka need raamatud, millel pole eksemplare; COUNT(veerg) annab nende puhul 0.</p></details></article><h3 class="practice-group">Osa 2. Uurime žanre ja autoreid</h3><article aria-labelledby="practice-title-4" class="practice-card"><div class="practice-num">Ülesanne 4 / 8</div><h4 id="practice-title-4">Mitu raamatut kuulub igasse žanrisse?</h4><p>Leia iga žanri nimi ja sellesse žanrisse kuuluvate raamatute arv.</p><details class="practice-solution"><summary>Vaata SQL-lahendust</summary><div class="practice-code"><button aria-label="Kopeeri ülesande 4 SQL-kood" class="practice-copy" data-practice-copy="4" type="button">Kopeeri SQL</button><pre><code>SELECT Genre.genre_name,
+       COUNT(Book_Genre.book_id) AS Raamatute_arv
+FROM Genre
+LEFT JOIN Book_Genre ON Genre.genre_id = Book_Genre.genre_id
+GROUP BY Genre.genre_id, Genre.genre_name;</code></pre></div><p class="practice-explain">Selgitus: Üks raamat võib kuuluda mitmesse žanrisse, seega ei pea rühmade summad võrduma eri raamatute koguarvuga.</p></details></article><article aria-labelledby="practice-title-5" class="practice-card"><div class="practice-num">Ülesanne 5 / 8</div><h4 id="practice-title-5">Mitu raamatut on igal autoril meie raamatukogus?</h4><p>Kuva iga autori eesnimi, perekonnanimi ja tema raamatute arv.</p><details class="practice-solution"><summary>Vaata SQL-lahendust</summary><div class="practice-code"><button aria-label="Kopeeri ülesande 5 SQL-kood" class="practice-copy" data-practice-copy="5" type="button">Kopeeri SQL</button><pre><code>SELECT Author.first_name,
+       Author.last_name,
+       COUNT(Book_Author.book_id) AS Raamatute_arv
+FROM Author
+LEFT JOIN Book_Author ON Author.author_id = Book_Author.author_id
+GROUP BY Author.author_id, Author.first_name, Author.last_name;</code></pre></div><p class="practice-explain">Selgitus: Rühmitame autori unikaalse identifikaatori järgi, et samanimelisi autoreid mitte ühendada.</p></details></article><h3 class="practice-group">Osa 3. Uurime laenutatud raamatueksemplare</h3><article aria-labelledby="practice-title-6" class="practice-card"><div class="practice-num">Ülesanne 6 / 8</div><h4 id="practice-title-6">Mitu raamatueksemplari on raamatukogust kokku laenutatud?</h4><p>Leia, mitu raamatueksemplari on laenutuste ajaloo jooksul välja antud. Arvesta ka korduvaid laenutusi.</p><details class="practice-solution"><summary>Vaata SQL-lahendust</summary><div class="practice-code"><button aria-label="Kopeeri ülesande 6 SQL-kood" class="practice-copy" data-practice-copy="6" type="button">Kopeeri SQL</button><pre><code>SELECT COUNT(*) AS Laenutatud_eksemplaride_arv
+FROM Loan_Line;</code></pre></div><p class="practice-explain">Selgitus: Loendame laenutusridu, mitte erinevaid füüsilisi eksemplare.</p></details></article><article aria-labelledby="practice-title-7" class="practice-card"><div class="practice-num">Ülesanne 7 / 8</div><h4 id="practice-title-7">Mitu raamatueksemplari on veel tagastamata?</h4><p>Leia, mitu laenutatud raamatueksemplari ei ole veel raamatukokku tagasi toodud.</p><details class="practice-solution"><summary>Vaata SQL-lahendust</summary><div class="practice-code"><button aria-label="Kopeeri ülesande 7 SQL-kood" class="practice-copy" data-practice-copy="7" type="button">Kopeeri SQL</button><pre><code>SELECT COUNT(*) AS Tagastamata_eksemplaride_arv
+FROM Loan_Line
+WHERE return_date IS NULL;</code></pre></div><p class="practice-explain">Selgitus: WHERE jätab alles ainult tagastamata laenutuse read.</p></details></article><article aria-labelledby="practice-title-8" class="practice-card"><div class="practice-num">Ülesanne 8 / 8</div><h4 id="practice-title-8">Mitu korda on iga raamatut laenutatud?</h4><p>Leia iga raamatu pealkiri ja selle laenutamiste arv. Arvesta sama raamatu erinevate eksemplaride korduvaid laenutusi.</p><details class="practice-solution"><summary>Vaata SQL-lahendust</summary><div class="practice-code"><button aria-label="Kopeeri ülesande 8 SQL-kood" class="practice-copy" data-practice-copy="8" type="button">Kopeeri SQL</button><pre><code>SELECT Book.title,
+       COUNT(Loan_Line.loan_line_id) AS Laenutuste_arv
+FROM Book
+LEFT JOIN Book_Copy ON Book.book_id = Book_Copy.book_id
+LEFT JOIN Loan_Line ON Book_Copy.book_copy_id = Loan_Line.copy_id
+GROUP BY Book.book_id, Book.title;</code></pre></div><p class="practice-explain">Selgitus: Loendame iga raamatu kõigi eksemplaride laenutuskordi, mitte ainult eksemplaride arvu.</p></details></article></section></div></main><footer>RKE134 · Andmebaaside alused · Nädal 11 · SQLite õppematerjal</footer>
+<script>const glossary=[
+['COUNT(*)','Loendab kõik tulemuse read, kaasa arvatud need, mille veergudes on NULL-väärtusi.'],
+['COUNT(veerg)','Loendab ainult read, kus määratud veeru väärtus ei ole NULL.'],
+['COUNT(DISTINCT veerg)','Loendab erinevad mitte-NULL väärtused; kordused arvesse ei lähe.'],
+['GROUP BY','Rühmitab read ühe või mitme veeru väärtuste järgi.'],
+['WHERE','Filtreerib üksikuid ridu enne rühmitamist.'],
+['HAVING','Filtreerib rühmi pärast rühmitamist, näiteks COUNT() põhjal.'],
+['ORDER BY','Sorteerib tulemuse kasvavalt (ASC) või kahanevalt (DESC).'],
+['LIMIT','Piirab kuvatavate tulemusridade arvu.'],
+['AS','Annab veerule või tabelile ajutise nime ehk aliase.']
+];document.querySelector('#glossary').innerHTML=glossary.map(x=>'<div class="card"><code>'+x[0]+'</code><h3>'+x[0]+'</h3><p>'+x[1]+'</p></div>').join('');
+const data=[[1,'2025-12-02'],[1,'2026-01-08'],[1,'2026-02-10'],[1,'2026-04-11'],[1,'2026-06-14'],[2,'2026-03-03'],[2,'2026-07-18'],[3,'2025-09-17'],[3,'2026-05-12'],[4,'2026-02-01'],[4,'2026-03-04'],[4,'2026-05-16'],[4,'2026-09-21']];
+const explanations={all:'Kõik laenutused rühmitatakse lugeja järgi.',where:'Enne rühmitamist jäetakse 2026. aastast varasemad laenutused kõrvale.',having:'Kõigepealt loendatakse kõik laenutused, seejärel jäetakse alles ainult rühmad, milles on üle kolme laenutuse.',both:'WHERE valib kõigepealt kuupäeva järgi read. Seejärel GROUP BY rühmitab, COUNT() loendab ja HAVING filtreerib rühmad.'};
+function updateDemo(mode){let w=mode==='where'||mode==='both',h=mode==='having'||mode==='both';const filtered=data.filter(x=>!w||x[1]>='2026-01-01');document.querySelector('#loans').innerHTML=data.map(x=>'<tr class="'+(w&&x[1]<'2026-01-01'?'dim':'')+'"><td>'+x[0]+'</td><td>'+x[1]+'</td></tr>').join('');let counts={};filtered.forEach(x=>counts[x[0]]=(counts[x[0]]||0)+1);document.querySelector('#result').innerHTML=Object.entries(counts).filter(x=>!h||x[1]>3).map(x=>'<tr class="resultrow"><td>'+x[0]+'</td><td>'+x[1]+'</td></tr>').join('')||'<tr><td colspan="2">Sobivaid rühmi pole</td></tr>';document.querySelector('#demoSQL').textContent='SELECT reader_id, COUNT(*) AS Laenutuste_arv\nFROM Loan'+(w?"\nWHERE loan_date >= '2026-01-01'":'')+'\nGROUP BY reader_id'+(h?'\nHAVING COUNT(*) > 3':'')+';';document.querySelector('#explanation').textContent=explanations[mode];document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode))}
+document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>updateDemo(b.dataset.mode)));updateDemo('all');
+const examples=[
+['count','Mitu raamatut on raamatukogus?','Loendame kõik Book tabeli kirjed.',`SELECT COUNT(*) AS Raamatute_arv
+FROM Book;`],
+['count','Mitu lugejat on registreeritud?','Loendame Reader tabeli kirjed.',`SELECT COUNT(*) AS Lugejate_arv
+FROM Reader;`],
+['count','Mitu laenutust on vormistatud?','Üks Loan kirje võib sisaldada mitut raamatut.',`SELECT COUNT(*) AS Laenutuste_arv
+FROM Loan;`],
+['count','Mitu raamatueksemplari on olemas?','Ühel raamatul võib olla mitu eksemplari.',`SELECT COUNT(*) AS Eksemplaride_arv
+FROM Book_Copy;`],
+['count','Mitu raamatut ilmus pärast 2020. aastat?','WHERE valib read enne loendamist. Aastaarv on Book.year_of_publishing veerus.',`SELECT COUNT(*) AS Raamatute_arv
+FROM Book
+WHERE year_of_publishing > 2020;`],
+['count','Mitu eksemplari on kindlal raamatul?','Asenda pealkiri oma andmebaasis olemasolevaga.',`SELECT Book.title, COUNT(Book_Copy.book_copy_id) AS Eksemplaride_arv
+FROM Book
+JOIN Book_Copy ON Book.book_id = Book_Copy.book_id
+WHERE Book.title = '1984'
+GROUP BY Book.book_id, Book.title;`],
+['count','Mitu raamatu väljastamist on registreeritud?','Loan_Line kirjed, sealhulgas korduslaenutused.',`SELECT COUNT(*) AS Laenutatud_raamatute_arv
+FROM Loan_Line;`],
+['group','Mitu eksemplari on igast raamatust?','Üks tulemusrida iga raamatu kohta.',`SELECT Book.title,
+       COUNT(Book_Copy.book_copy_id) AS Eksemplaride_arv
+FROM Book
+JOIN Book_Copy ON Book.book_id = Book_Copy.book_id
+GROUP BY Book.book_id, Book.title;`],
+['group','Mitu laenutust tegi iga lugeja?','JOIN näitab vaid lugejaid, kellel on laenutusi.',`SELECT Reader.first_name, Reader.last_name,
+       COUNT(Loan.loan_id) AS Laenutuste_arv
+FROM Reader
+JOIN Loan ON Reader.reader_id = Loan.reader_id
+GROUP BY Reader.reader_id, Reader.first_name, Reader.last_name;`],
+['group','Näita ka null laenutusega lugejaid','LEFT JOIN jätab alles kõik lugejad.',`SELECT Reader.first_name, Reader.last_name,
+       COUNT(Loan.loan_id) AS Laenutuste_arv
+FROM Reader
+LEFT JOIN Loan ON Reader.reader_id = Loan.reader_id
+GROUP BY Reader.reader_id, Reader.first_name, Reader.last_name;`],
+['group','COUNT(*) ja COUNT(Loan.loan_id) erinevus','Ilma laenutusteta lugejal on LEFT JOIN-iga COUNT(*) = 1, COUNT(Loan.loan_id) = 0.',`SELECT Reader.first_name, Reader.last_name,
+       COUNT(*) AS Koik_read,
+       COUNT(Loan.loan_id) AS Laenutuste_arv
+FROM Reader
+LEFT JOIN Loan ON Reader.reader_id = Loan.reader_id
+GROUP BY Reader.reader_id, Reader.first_name, Reader.last_name;`],
+['group','Kes laenutas kõige sagedamini?','ORDER BY järjestab tulemuse suuremast väiksemani.',`SELECT Reader.first_name, Reader.last_name,
+       COUNT(Loan.loan_id) AS Laenutuste_arv
+FROM Reader
+JOIN Loan ON Reader.reader_id = Loan.reader_id
+GROUP BY Reader.reader_id, Reader.first_name, Reader.last_name
+ORDER BY Laenutuste_arv DESC;`],
+['group','Viis aktiivseimat lugejat','LIMIT valib viis esimest tulemusrida.',`SELECT Reader.first_name, Reader.last_name,
+       COUNT(Loan.loan_id) AS Laenutuste_arv
+FROM Reader
+JOIN Loan ON Reader.reader_id = Loan.reader_id
+GROUP BY Reader.reader_id, Reader.first_name, Reader.last_name
+ORDER BY Laenutuste_arv DESC
+LIMIT 5;`],
+['having','Kes on vormistanud üle kolme laenutuse?','HAVING filtreerib rühmitatud tulemusi.',`SELECT Reader.first_name, Reader.last_name,
+       COUNT(Loan.loan_id) AS Laenutuste_arv
+FROM Reader
+JOIN Loan ON Reader.reader_id = Loan.reader_id
+GROUP BY Reader.reader_id, Reader.first_name, Reader.last_name
+HAVING COUNT(Loan.loan_id) > 3;`],
+['having','Milliseid raamatuid on üle kahe eksemplari?','Filtreerime rühmad COUNT() tulemuse põhjal.',`SELECT Book.title,
+       COUNT(Book_Copy.book_copy_id) AS Eksemplaride_arv
+FROM Book
+JOIN Book_Copy ON Book.book_id = Book_Copy.book_id
+GROUP BY Book.book_id, Book.title
+HAVING COUNT(Book_Copy.book_copy_id) > 2;`],
+['advanced','Mitu eksemplari laenutas iga lugeja?','Loendame Loan_Line kirjed, mitte ainult Loan päised.',`SELECT Reader.first_name, Reader.last_name,
+       COUNT(Loan_Line.copy_id) AS Raamatute_arv
+FROM Reader
+JOIN Loan ON Reader.reader_id = Loan.reader_id
+JOIN Loan_Line ON Loan.loan_id = Loan_Line.loan_id
+GROUP BY Reader.reader_id, Reader.first_name, Reader.last_name
+ORDER BY Raamatute_arv DESC;`],
+['advanced','Milliseid raamatuid on kõige rohkem laenutatud?','Loendame raamatu kõigi eksemplaride väljastamised.',`SELECT Book.title,
+       COUNT(Loan_Line.copy_id) AS Laenutuste_arv
+FROM Book
+JOIN Book_Copy ON Book.book_id = Book_Copy.book_id
+JOIN Loan_Line ON Book_Copy.book_copy_id = Loan_Line.copy_id
+GROUP BY Book.book_id, Book.title
+ORDER BY Laenutuste_arv DESC;`],
+['advanced','Milliseid raamatuid pole kordagi laenutatud?','LEFT JOIN ja HAVING COUNT() = 0.',`SELECT Book.title,
+       COUNT(Loan_Line.copy_id) AS Laenutuste_arv
+FROM Book
+LEFT JOIN Book_Copy ON Book.book_id = Book_Copy.book_id
+LEFT JOIN Loan_Line ON Book_Copy.book_copy_id = Loan_Line.copy_id
+GROUP BY Book.book_id, Book.title
+HAVING COUNT(Loan_Line.copy_id) = 0;`]
+];
+function escapeHTML(s){return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')}
+function renderExamples(filter){document.querySelector('#examples').innerHTML=examples.map((e,i)=>({e,i})).filter(x=>filter==='all'||x.e[0]===filter).map(({e,i})=>'<article class="example"><div class="example-head"><div class="pill">Näide '+String(i+1).padStart(2,'0')+' · '+e[0].toUpperCase()+'</div><h3>'+e[1]+'</h3><p>'+e[2]+'</p></div><div class="codeblock"><button class="copy" data-copy="'+i+'">Kopeeri</button><pre>'+escapeHTML(e[3])+'</pre></div></article>').join('');document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(examples[+b.dataset.copy][3]);b.textContent='Kopeeritud ✓'}catch{b.textContent='Vali kood'}setTimeout(()=>b.textContent='Kopeeri',1800)}));document.querySelectorAll('[data-filter]').forEach(b=>b.classList.toggle('active',b.dataset.filter===filter))}
+document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>renderExamples(b.dataset.filter)));renderExamples('all');
+const questions=[
+{q:'Milline väide kirjeldab WHERE tingimust?',a:['Filtreerib rühmi pärast COUNT() kasutamist.','Filtreerib üksikuid ridu enne rühmitamist.','Sorteerib tulemuse.'],right:1,why:'WHERE kontrollib ridu enne GROUP BY etappi.'},
+{q:'Mida loendab COUNT(Loan.loan_id) koos LEFT JOIN-iga?',a:['Kõik tulemuse read, ka null laenutusega lugejal.','Ainult mitte-NULL loan_id väärtused.','Ainult erinevad raamatud.'],right:1,why:'COUNT(veerg) jätab NULL-väärtused arvestusest välja.'},
+{q:'Milline tingimus leiab rühmad, kus on üle kolme laenutuse?',a:['WHERE COUNT(*) > 3','ORDER BY COUNT(*) > 3','HAVING COUNT(*) > 3'],right:2,why:'HAVING kontrollib rühmade agregeeritud tulemusi.'}
+];let qi=0,score=0,answered=false;const next=document.querySelector('#next');
+function draw(){answered=false;let q=questions[qi];document.querySelector('#qnum').textContent='Küsimus '+(qi+1)+' / 3';document.querySelector('#question').textContent=q.q;document.querySelector('#feedback').textContent='';next.classList.add('hidden');document.querySelector('#answers').innerHTML=q.a.map((a,i)=>'<button data-answer="'+i+'">'+a+'</button>').join('');document.querySelectorAll('[data-answer]').forEach(b=>b.addEventListener('click',()=>{if(answered)return;answered=true;const selected=+b.dataset.answer;if(selected===q.right)score++;document.querySelectorAll('[data-answer]').forEach(x=>{x.disabled=true;if(+x.dataset.answer===q.right)x.classList.add('correct');else if(x===b)x.classList.add('wrong')});document.querySelector('#feedback').textContent=q.why;next.textContent=qi===2?'Vaata tulemust →':'Järgmine küsimus →';next.classList.remove('hidden')}))}
+next.addEventListener('click',()=>{if(qi<2){qi++;draw()}else if(qi===2){qi=3;document.querySelector('#qnum').textContent='Valmis!';document.querySelector('#question').textContent='Sinu tulemus: '+score+' / 3';document.querySelector('#answers').innerHTML='';document.querySelector('#feedback').textContent='Harjuta soovi korral uuesti.';next.textContent='Proovi uuesti ↻'}else{qi=0;score=0;draw()}});draw();
+
+const taskQueries = ["SELECT COUNT(*) AS Raamatute_arv\nFROM Book;", "SELECT COUNT(*) AS Eksemplaride_arv\nFROM Book_Copy;", "SELECT COUNT(*) AS Lugejate_arv\nFROM Reader;", "SELECT COUNT(*) AS Laenutuste_arv\nFROM Loan;", "SELECT COUNT(*) AS Valjastamiste_arv\nFROM Loan_Line;", "SELECT Book.title,\n       COUNT(Book_Copy.book_copy_id) AS Eksemplaride_arv\nFROM Book\nLEFT JOIN Book_Copy\n  ON Book.book_id = Book_Copy.book_id\nGROUP BY Book.book_id, Book.title\nORDER BY Eksemplaride_arv DESC, Book.title;", "SELECT Reader.first_name, Reader.last_name,\n       COUNT(Loan.loan_id) AS Laenutuste_arv\nFROM Reader\nLEFT JOIN Loan\n  ON Reader.reader_id = Loan.reader_id\nGROUP BY Reader.reader_id, Reader.first_name, Reader.last_name\nORDER BY Laenutuste_arv DESC, Reader.last_name;", "SELECT Book.title,\n       COUNT(Loan_Line.loan_line_id) AS Laenutuskordade_arv\nFROM Book\nLEFT JOIN Book_Copy\n  ON Book.book_id = Book_Copy.book_id\nLEFT JOIN Loan_Line\n  ON Book_Copy.book_copy_id = Loan_Line.copy_id\nGROUP BY Book.book_id, Book.title\nORDER BY Laenutuskordade_arv DESC, Book.title;", "SELECT Genre.genre_name,\n       COUNT(DISTINCT Book_Genre.book_id) AS Raamatute_arv\nFROM Genre\nLEFT JOIN Book_Genre\n  ON Genre.genre_id = Book_Genre.genre_id\nGROUP BY Genre.genre_id, Genre.genre_name\nORDER BY Raamatute_arv DESC, Genre.genre_name;", "SELECT Author.first_name, Author.last_name,\n       COUNT(DISTINCT Book_Author.book_id) AS Raamatute_arv\nFROM Author\nLEFT JOIN Book_Author\n  ON Author.author_id = Book_Author.author_id\nGROUP BY Author.author_id, Author.first_name, Author.last_name\nORDER BY Raamatute_arv DESC, Author.last_name;", "SELECT Book.title,\n       COUNT(Loan_Line.loan_line_id) AS Laenutuskordade_arv\nFROM Book\nJOIN Book_Copy\n  ON Book.book_id = Book_Copy.book_id\nJOIN Loan_Line\n  ON Book_Copy.book_copy_id = Loan_Line.copy_id\nGROUP BY Book.book_id, Book.title\nORDER BY Laenutuskordade_arv DESC, Book.title\nLIMIT 5;", "SELECT Reader.first_name, Reader.last_name,\n       COUNT(Loan.loan_id) AS Laenutuste_arv\nFROM Reader\nJOIN Loan\n  ON Reader.reader_id = Loan.reader_id\nGROUP BY Reader.reader_id, Reader.first_name, Reader.last_name\nORDER BY Laenutuste_arv DESC, Reader.last_name\nLIMIT 5;", "SELECT Genre.genre_name,\n       COUNT(DISTINCT Book_Genre.book_id) AS Raamatute_arv\nFROM Genre\nJOIN Book_Genre\n  ON Genre.genre_id = Book_Genre.genre_id\nGROUP BY Genre.genre_id, Genre.genre_name\nORDER BY Raamatute_arv DESC, Genre.genre_name\nLIMIT 1;", "SELECT Book.title,\n       COUNT(Book_Copy.book_copy_id) AS Eksemplaride_arv\nFROM Book\nJOIN Book_Copy\n  ON Book.book_id = Book_Copy.book_id\nGROUP BY Book.book_id, Book.title\nHAVING COUNT(Book_Copy.book_copy_id) > 5\nORDER BY Eksemplaride_arv DESC, Book.title;", "SELECT Reader.first_name, Reader.last_name,\n       COUNT(Loan.loan_id) AS Laenutuste_arv\nFROM Reader\nJOIN Loan\n  ON Reader.reader_id = Loan.reader_id\nGROUP BY Reader.reader_id, Reader.first_name, Reader.last_name\nHAVING COUNT(Loan.loan_id) > 10\nORDER BY Laenutuste_arv DESC, Reader.last_name;", "SELECT Book.title,\n       COUNT(Loan_Line.loan_line_id) AS Laenutuskordade_arv\nFROM Book\nJOIN Book_Copy\n  ON Book.book_id = Book_Copy.book_id\nJOIN Loan_Line\n  ON Book_Copy.book_copy_id = Loan_Line.copy_id\nGROUP BY Book.book_id, Book.title\nHAVING COUNT(Loan_Line.loan_line_id) > 5\nORDER BY Laenutuskordade_arv DESC, Book.title;", "SELECT Reader.first_name, Reader.last_name,\n       COUNT(Loan.loan_id) AS Laenutuste_arv\nFROM Reader\nLEFT JOIN Loan\n  ON Reader.reader_id = Loan.reader_id\nGROUP BY Reader.reader_id, Reader.first_name, Reader.last_name\nHAVING COUNT(Loan.loan_id) = 0\nORDER BY Reader.last_name, Reader.first_name;", "SELECT Book.title,\n       COUNT(Loan_Line.loan_line_id) AS Laenutuskordade_arv\nFROM Book\nLEFT JOIN Book_Copy\n  ON Book.book_id = Book_Copy.book_id\nLEFT JOIN Loan_Line\n  ON Book_Copy.book_copy_id = Loan_Line.copy_id\nGROUP BY Book.book_id, Book.title\nHAVING COUNT(Loan_Line.loan_line_id) = 0\nORDER BY Book.title;", "SELECT COUNT(DISTINCT copy_id) AS Tagastamata_eksemplare\nFROM Loan_Line\nWHERE return_date IS NULL;", "SELECT Reader.first_name, Reader.last_name,\n       COUNT(Loan_Line.loan_line_id) AS Valjastamiste_arv\nFROM Reader\nJOIN Loan\n  ON Reader.reader_id = Loan.reader_id\nJOIN Loan_Line\n  ON Loan.loan_id = Loan_Line.loan_id\nGROUP BY Reader.reader_id, Reader.first_name, Reader.last_name\nORDER BY Valjastamiste_arv DESC, Reader.last_name\nLIMIT 10;"];
+function showPage(page){
+ const active=['materjal','ulesanded','uurimus','harjutused'].includes(page)?page:'materjal';
+ document.querySelector('#materjal-view').hidden=active!=='materjal';
+ document.querySelector('#ulesanded-view').hidden=active!=='ulesanded';
+ document.querySelector('#uurimus-view').hidden=active!=='uurimus';
+ document.querySelector('#harjutused-view').hidden=active!=='harjutused';
+ document.querySelectorAll('.navtab').forEach(b=>{const on=b.dataset.page===active;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1});
+ window.location.hash=active==='materjal'?'teooria':active;
+ window.scrollTo({top:0,behavior:'instant'});
+}
+document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+document.querySelectorAll('[data-journey-copy]').forEach(b=>b.addEventListener('click',async()=>{const pre=b.parentElement.querySelector('code');try{await navigator.clipboard.writeText(pre.textContent);b.textContent='Kopeeritud!';setTimeout(()=>b.textContent='Kopeeri SQL',1500)}catch(e){const sel=window.getSelection();const range=document.createRange();range.selectNodeContents(pre);sel.removeAllRanges();sel.addRange(range);b.textContent='Vali ja kopeeri Ctrl+C';}}));
+document.querySelectorAll('[data-task-filter]').forEach(b=>b.addEventListener('click',()=>{
+ const f=b.dataset.taskFilter;
+ document.querySelectorAll('.task-card').forEach((card,i)=>card.hidden=f!=='all'&&["COUNT()", "COUNT()", "COUNT()", "COUNT()", "COUNT()", "GROUP BY", "GROUP BY", "GROUP BY", "GROUP BY", "GROUP BY", "ORDER BY", "ORDER BY", "ORDER BY", "HAVING", "HAVING", "HAVING", "KOKKU", "KOKKU", "KOKKU", "KOKKU"][i]!==f);
+ document.querySelectorAll('[data-task-filter]').forEach(other=>other.classList.toggle('active',other===b));
+}));
+document.querySelectorAll('[data-task]').forEach(b=>b.addEventListener('click',async()=>{
+ const sql=taskQueries[Number(b.dataset.task)];
+ try{await navigator.clipboard.writeText(sql);b.textContent='Kopeeritud ✓';}
+ catch{const field=document.createElement('textarea');field.value=sql;document.body.appendChild(field);field.select();try{document.execCommand('copy');b.textContent='Kopeeritud ✓'}catch{b.textContent='Vali kood'}field.remove();}
+ setTimeout(()=>b.textContent='Kopeeri SQL',1800);
+}));
+if(location.hash==='#ulesanded')showPage('ulesanded');
+else if(location.hash==='#uurimus'||location.hash.startsWith('#samm-')){showPage('uurimus');}
+else if(location.hash==='#harjutused')showPage('harjutused');
+
+// WAI-ARIA tab keyboard support: ArrowLeft/Right, Home, End
+const navTabs=[...document.querySelectorAll('.primary-nav [role="tab"]')];
+navTabs.forEach((tab,index)=>tab.addEventListener('keydown',event=>{
+ let target=index;
+ if(event.key==='ArrowRight')target=(index+1)%navTabs.length;
+ else if(event.key==='ArrowLeft')target=(index-1+navTabs.length)%navTabs.length;
+ else if(event.key==='Home')target=0;
+ else if(event.key==='End')target=navTabs.length-1;
+ else return;
+ event.preventDefault();
+ navTabs[target].focus();showPage(navTabs[target].dataset.page);
+}));
+// keep keyboard focus predictable; inform screen readers on copy
+const copyStatus=document.getElementById('copy-status');
+document.querySelectorAll('[data-practice-copy]').forEach(button=>button.addEventListener('click',async()=>{
+ const sql=button.parentElement.querySelector('code').textContent;
+ try{
+  if(navigator.clipboard&&window.isSecureContext)await navigator.clipboard.writeText(sql);
+  else {const field=document.createElement('textarea');field.value=sql;document.body.append(field);field.select();const ok=document.execCommand('copy');field.remove();if(!ok)throw new Error('Copy unavailable')}
+  copyStatus.textContent='SQL-kood kopeeritud.';button.textContent='Kopeeritud!';
+ }catch(e){copyStatus.textContent='Automaatne kopeerimine ei õnnestunud. Vali ja kopeeri kood käsitsi.';button.textContent='Vali kood käsitsi'}
+}));
+</script><div aria-live="polite" class="sr-only" id="copy-status" role="status"></div></body></html>
